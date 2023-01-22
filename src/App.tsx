@@ -8,11 +8,15 @@ const videoUrl =
 
 function App() {
   const [width, setWidth] = useState(0);
+  const [currentWami, setCurrentWami] = useState<any>("00");
+  // const [currentWuti, setCurrentWuti] = useState("00");
+
   const videoRef = useRef<any>(null);
 
   useEffect(() => {
     videoRef.current.addEventListener("timeupdate", (e: any) => {
       console.log(videoRef.current.width);
+      setCurrentWami(videoRef.current.currentTime.toFixed(2));
 
       setWidth(
         (videoRef.current.currentTime / videoRef.current.duration) * 100
@@ -47,22 +51,38 @@ function App() {
         </video>
         <div
           style={{
-            width: "80%",
-            height: 6,
-            backgroundColor: "rgba(255,255,255,0.7)",
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             position: "absolute",
-
             bottom: "100px",
-            left: 144,
+            border: "2px solid red",
           }}
         >
+          {/* <span style={{ fontSize: 24, fontWeight: 700 }}>{currentWuti} :</span> */}
+          <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
+            {currentWami}
+          </span>
+
           <div
             style={{
-              height: "100%",
-              width: `${width}%`,
-              backgroundColor: "#fff",
+              width: "80%",
+              height: 6,
+              backgroundColor: "rgba(255,255,255,0.7)",
             }}
-          ></div>
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${width}%`,
+                backgroundColor: "#fff",
+              }}
+            ></div>
+          </div>
+          <p style={{ fontSize: 24, fontWeight: 700 }}>
+            {(videoRef.current?.duration - currentWami).toFixed(2)}
+          </p>
         </div>
         <PlayBox>
           <img style={{ width: 32, height: 32 }} src={left} alt="" />
