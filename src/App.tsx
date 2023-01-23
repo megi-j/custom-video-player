@@ -2,6 +2,7 @@ import styled from "styled-components";
 import play from "./images/play-button.png";
 import left from "./images/left.png";
 import right from "./images/fast-forward.png";
+import setting from "./images/settings.png";
 import { useEffect, useRef, useState } from "react";
 const videoUrl =
   "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Big_Buck_Bunny_first_23_seconds_1080p.ogv/Big_Buck_Bunny_first_23_seconds_1080p.ogv.1080p.vp9.webm";
@@ -10,7 +11,7 @@ function App() {
   const [width, setWidth] = useState(0);
   const [currentWami, setCurrentWami] = useState<any>("00");
   const [currentWuti, setCurrentWuti] = useState<any>("00");
-
+  const [settingClicked, setSettingClicked] = useState<boolean>(false);
   const videoRef = useRef<any>(null);
 
   useEffect(() => {
@@ -43,6 +44,21 @@ function App() {
         >
           <source src={videoUrl} type="video/webm" />
         </video>
+        <select
+          style={{
+            width: 200,
+            height: 30,
+            backgroundColor: "rgba(255,255,255,0.5)",
+            display: settingClicked ? "block" : "none",
+            bottom: 180,
+            left: "50%",
+            transform: "translate(50%)",
+            position: "absolute",
+          }}
+        >
+          <option value="">360p</option>
+          <option value="">720p</option>
+        </select>
         <div
           style={{
             width: "100%",
@@ -51,10 +67,9 @@ function App() {
             alignItems: "center",
             position: "absolute",
             bottom: "100px",
-            border: "2px solid red",
           }}
         >
-          <span style={{ fontSize: 24, fontWeight: 700 }}>
+          <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 10 }}>
             {currentWuti} :
             <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
               {currentWami < 10 ? `0${currentWami}` : currentWami}
@@ -66,6 +81,7 @@ function App() {
               width: "80%",
               height: 6,
               backgroundColor: "rgba(255,255,255,0.7)",
+              borderRadius: 20,
             }}
           >
             <div
@@ -73,10 +89,11 @@ function App() {
                 height: "100%",
                 width: `${width}%`,
                 backgroundColor: "#fff",
+                borderRadius: 20,
               }}
             ></div>
           </div>
-          <span style={{ fontSize: 24, fontWeight: 700 }}>
+          <span style={{ fontSize: 24, fontWeight: 700, marginRight: 10 }}>
             {currentWuti} :
             <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
               {Number((videoRef.current?.duration - currentWami).toFixed(0)) <
@@ -99,6 +116,11 @@ function App() {
             }
           />
           <img style={{ width: 32, height: 32 }} src={right} alt="" />
+          <img
+            src={setting}
+            alt=""
+            onClick={() => setSettingClicked(!settingClicked)}
+          />
         </PlayBox>
       </div>
     </Container>
