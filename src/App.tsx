@@ -9,14 +9,13 @@ const videoUrl =
 function App() {
   const [width, setWidth] = useState(0);
   const [currentWami, setCurrentWami] = useState<any>("00");
-  // const [currentWuti, setCurrentWuti] = useState("00");
+  const [currentWuti, setCurrentWuti] = useState<any>("00");
 
   const videoRef = useRef<any>(null);
 
   useEffect(() => {
     videoRef.current.addEventListener("timeupdate", (e: any) => {
-      console.log(videoRef.current.width);
-      setCurrentWami(videoRef.current.currentTime.toFixed(2));
+      setCurrentWami(videoRef.current.currentTime.toFixed(0));
 
       setWidth(
         (videoRef.current.currentTime / videoRef.current.duration) * 100
@@ -28,11 +27,6 @@ function App() {
     });
   }, []);
 
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     setWidth(width + 62);
-  //   }, 1000);
-  // }, []);
   return (
     <Container>
       <div
@@ -60,9 +54,11 @@ function App() {
             border: "2px solid red",
           }}
         >
-          {/* <span style={{ fontSize: 24, fontWeight: 700 }}>{currentWuti} :</span> */}
-          <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
-            {currentWami}
+          <span style={{ fontSize: 24, fontWeight: 700 }}>
+            {currentWuti} :
+            <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
+              {currentWami < 10 ? `0${currentWami}` : currentWami}
+            </span>
           </span>
 
           <div
@@ -80,9 +76,15 @@ function App() {
               }}
             ></div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 700 }}>
-            {(videoRef.current?.duration - currentWami).toFixed(2)}
-          </p>
+          <span style={{ fontSize: 24, fontWeight: 700 }}>
+            {currentWuti} :
+            <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
+              {Number((videoRef.current?.duration - currentWami).toFixed(0)) <
+              10
+                ? `0${(videoRef.current?.duration - currentWami).toFixed(0)}`
+                : (videoRef.current?.duration - currentWami).toFixed(0)}
+            </span>
+          </span>
         </div>
         <PlayBox>
           <img style={{ width: 32, height: 32 }} src={left} alt="" />
