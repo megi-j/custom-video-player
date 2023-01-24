@@ -4,47 +4,52 @@ import left from "./images/left.png";
 import right from "./images/fast-forward.png";
 import setting from "./images/settings.png";
 import { useEffect, useRef, useState } from "react";
-const videoUrl =
-  "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Big_Buck_Bunny_first_23_seconds_1080p.ogv/Big_Buck_Bunny_first_23_seconds_1080p.ogv.1080p.vp9.webm";
+import video360 from "./videos/360.mp4";
+import video720 from "./videos/720.mp4";
+import { ProgressDiv } from "./components/ProgressDiv";
+// const videoUrl =
+//   "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Big_Buck_Bunny_first_23_seconds_1080p.ogv/Big_Buck_Bunny_first_23_seconds_1080p.ogv.1080p.vp9.webm";
 
 function App() {
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useState<any>(0);
   const [currentWami, setCurrentWami] = useState<any>("00");
   const [currentWuti, setCurrentWuti] = useState<any>("00");
   const [settingClicked, setSettingClicked] = useState<boolean>(false);
+  const [leftWami, setLeftWami] = useState("00");
+  const [value, setValue] = useState(360);
   const videoRef = useRef<any>(null);
 
   useEffect(() => {
     videoRef.current.addEventListener("timeupdate", (e: any) => {
       setCurrentWami(videoRef.current.currentTime.toFixed(0));
-
+      // console.log(videoRef.current.duration);
+      if (videoRef.current.duration > 60) {
+        console.log(videoRef.current.duration);
+        let time = videoRef.current.duration / 60;
+        console.log(time);
+        let wami = time.toString().split(".")[1].slice(0, 2);
+        setLeftWami(wami);
+      }
       setWidth(
         (videoRef.current.currentTime / videoRef.current.duration) * 100
       );
-      // setInterval(() => {
-      //   setWidth(growWidth);
-      // }, 1000);
-      // console.log("%: " + growWidth);
     });
   }, []);
-
+  function handleChange(e: any) {
+    if (e.target.value === 720) {
+      setValue(720);
+      console.log(value);
+    }
+  }
   return (
     <Container>
-      <div
-        style={{
-          width: "100%",
-          position: "relative",
-        }}
-      >
-        <video
-          ref={videoRef}
-          style={{
-            width: "100%",
-          }}
-        >
-          <source src={videoUrl} type="video/webm" />
-        </video>
+      <MainDiv>
+        <Video ref={videoRef}>
+          <source src={video360} type="video/webm" />
+        </Video>
         <select
+          onChange={(e) => handleChange(e)}
+          value={value}
           style={{
             width: 200,
             height: 30,
@@ -56,8 +61,8 @@ function App() {
             position: "absolute",
           }}
         >
-          <option value="">360p</option>
-          <option value="">720p</option>
+          <option value="360">360p</option>
+          <option value="720">720p</option>
         </select>
         <div
           style={{
@@ -69,14 +74,14 @@ function App() {
             bottom: "100px",
           }}
         >
-          <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 10 }}>
-            {currentWuti} :
-            <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
+          <StartMinute>
+            {Number(currentWuti)} :
+            <StartSecond>
               {currentWami < 10 ? `0${currentWami}` : currentWami}
-            </span>
-          </span>
+            </StartSecond>
+          </StartMinute>
 
-          <div
+          <BackDiv
             style={{
               width: "80%",
               height: 6,
@@ -84,18 +89,25 @@ function App() {
               borderRadius: 20,
             }}
           >
-            <div
-              style={{
-                height: "100%",
-                width: `${width}%`,
-                backgroundColor: "#fff",
-                borderRadius: 20,
-              }}
-            ></div>
-          </div>
-          <span style={{ fontSize: 24, fontWeight: 700, marginRight: 10 }}>
+            <ProgressDiv width={width} />
+          </BackDiv>
+          <span
+            style={{
+              fontSize: 24,
+              fontWeight: 700,
+              marginRight: 10,
+              color: "#fff",
+            }}
+          >
             {currentWuti} :
-            <span style={{ fontSize: 24, fontWeight: 700, marginLeft: 0 }}>
+            <span
+              style={{
+                fontSize: 24,
+                fontWeight: 700,
+                marginLeft: 0,
+                color: "#fff",
+              }}
+            >
               {Number((videoRef.current?.duration - currentWami).toFixed(0)) <
               10
                 ? `0${(videoRef.current?.duration - currentWami).toFixed(0)}`
@@ -122,7 +134,7 @@ function App() {
             onClick={() => setSettingClicked(!settingClicked)}
           />
         </PlayBox>
-      </div>
+      </MainDiv>
     </Container>
   );
 }
@@ -145,4 +157,29 @@ const PlayBox = styled.div`
   bottom: 10px;
   left: 50%;
   transform: translate(-50%);
+`;
+const MainDiv = styled.div`
+  width: 100%;
+  position: relative;
+`;
+const Video = styled.video`
+  width: 100%;
+`;
+const StartMinute = styled.span`
+  font-size: 24px;
+  font-weight: 700;
+  margin-left: 10px;
+  color: #fff;
+`;
+const StartSecond = styled.span`
+  font-size: 24px;
+  font-weight: 700;
+  margin-left: 0;
+  color: #fff;
+`;
+const BackDiv = styled.div`
+  width: 80%;
+  height: 6px;
+  background-color: rgba(255, 255, 255.7);
+  border-radius: 20px;
 `;
