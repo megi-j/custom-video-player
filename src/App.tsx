@@ -6,50 +6,88 @@ import setting from "./images/settings.png";
 import { useEffect, useRef, useState } from "react";
 import video360 from "./videos/360.mp4";
 import video720 from "./videos/720.mp4";
-import { ProgressDiv } from "./components/ProgressDiv";
-// const videoUrl =
-//   "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Big_Buck_Bunny_first_23_seconds_1080p.ogv/Big_Buck_Bunny_first_23_seconds_1080p.ogv.1080p.vp9.webm";
+const videoUrl =
+  "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/Big_Buck_Bunny_first_23_seconds_1080p.ogv/Big_Buck_Bunny_first_23_seconds_1080p.ogv.1080p.vp9.webm";
 
 function App() {
-  const [width, setWidth] = useState<any>(0);
-  const [currentWami, setCurrentWami] = useState<any>("00");
-  const [currentWuti, setCurrentWuti] = useState<any>("00");
+  const [width, setWidth] = useState(0);
+  const [currentWami, setCurrentWami] = useState<any>("00:00");
+  const [currentWuti, setCurrentWuti] = useState<any>();
   const [settingClicked, setSettingClicked] = useState<boolean>(false);
-  const [leftWami, setLeftWami] = useState("00");
-  const [value, setValue] = useState(360);
+  const [totalWami, setTotalWami] = useState<any>("00:00");
+  const [totalWuti, setTotalWuti] = useState<any>();
+  const [leftTime, setLeftTime] = useState<any>();
+  const [chosenVideoQuality, setChosenVideoQuality] = useState(360);
   const videoRef = useRef<any>(null);
+  let minutes;
+  let extraSeconds;
+  function convertSeconds(seconds: any) {
+    minutes = Math.floor(seconds / 60);
+    extraSeconds = seconds % 60;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    extraSeconds = extraSeconds < 10 ? "0" + extraSeconds : extraSeconds;
+    setCurrentWami(extraSeconds);
+    setCurrentWuti(minutes);
 
+    // console.log(minutes, extraSeconds);
+  }
   useEffect(() => {
     videoRef.current.addEventListener("timeupdate", (e: any) => {
-      setCurrentWami(videoRef.current.currentTime.toFixed(0));
-      // console.log(videoRef.current.duration);
-      if (videoRef.current.duration > 60) {
-        console.log(videoRef.current.duration);
-        let time = videoRef.current.duration / 60;
-        console.log(time);
-        let wami = time.toString().split(".")[1].slice(0, 2);
-        setLeftWami(wami);
+      convertSeconds(videoRef.current.currentTime.toFixed(0));
+      if (Number((videoRef.current.duration.toFixed(0) / 60).toFixed(2)) < 10) {
+        setTotalWuti(
+          "0" + (videoRef.current.duration.toFixed(0) / 60).toFixed(0)
+        );
+      } else {
+        setTotalWuti((videoRef.current.duration.toFixed(0) / 60).toFixed(0));
       }
+      setTotalWami(
+        (videoRef.current.duration.toFixed(0) / 60)
+          .toString()
+          .split(".")[1]
+          .slice(0, 2)
+      );
+      // let time =
+      //   (videoRef.current.duration.toFixed(0) -
+      //     videoRef.current.currentTime.toFixed(0)) /
+      //   60;
+      // console.log(videoRef.current.duration.toFixed(0));
+      // console.log(videoRef.current.currentTime.toFixed(0));
+      // if (Number(time.toFixed(0)) < 10) {
+      //   setLeftWuti("0" + time.toFixed(0));
+      // } else {
+      //   setLeftWuti(time.toFixed(0));
+      // }
+
+      // let wami = time.toString().split(".")[1].slice(0, 2);
+      // setLeftWami(wami);
+
       setWidth(
         (videoRef.current.currentTime / videoRef.current.duration) * 100
       );
     });
   }, []);
+
   function handleChange(e: any) {
-    if (e.target.value === 720) {
-      setValue(720);
-      console.log(value);
-    }
+    setChosenVideoQuality(e.target.value);
+    console.log(chosenVideoQuality);
   }
   return (
     <Container>
       <MainDiv>
-        <Video ref={videoRef}>
-          <source src={video360} type="video/webm" />
-        </Video>
+        {chosenVideoQuality == 360 ? (
+          <Video ref={videoRef}>
+            <source src={videoUrl} type="video/webm" />
+          </Video>
+        ) : (
+          <Video ref={videoRef}>
+            <source src={videoUrl} type="video/webm" />
+          </Video>
+        )}
+
         <select
           onChange={(e) => handleChange(e)}
-          value={value}
+          // value={chosenVideoQuality}
           style={{
             width: 200,
             height: 30,
@@ -75,10 +113,7 @@ function App() {
           }}
         >
           <StartMinute>
-            {Number(currentWuti)} :
-            <StartSecond>
-              {currentWami < 10 ? `0${currentWami}` : currentWami}
-            </StartSecond>
+            {currentWuti} :<StartSecond>{currentWami}</StartSecond>
           </StartMinute>
 
           <BackDiv
@@ -89,31 +124,25 @@ function App() {
               borderRadius: 20,
             }}
           >
-            <ProgressDiv width={width} />
-          </BackDiv>
-          <span
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              marginRight: 10,
-              color: "#fff",
-            }}
-          >
-            {currentWuti} :
-            <span
+            <div
               style={{
-                fontSize: 24,
-                fontWeight: 700,
-                marginLeft: 0,
-                color: "#fff",
+                height: "100%",
+                width: `${width}%`,
+                backgroundColor: "#fff",
+                borderRadius: 20,
               }}
-            >
-              {Number((videoRef.current?.duration - currentWami).toFixed(0)) <
+            ></div>
+          </BackDiv>
+          <RemainMinute>
+            {totalWuti} :
+            <RemainSecond>
+              {/* {Number((videoRef.current?.duration - currentWami).toFixed(0)) <
               10
                 ? `0${(videoRef.current?.duration - currentWami).toFixed(0)}`
-                : (videoRef.current?.duration - currentWami).toFixed(0)}
-            </span>
-          </span>
+                : (videoRef.current?.duration - currentWami).toFixed(0)} */}
+              {totalWami}
+            </RemainSecond>
+          </RemainMinute>
         </div>
         <PlayBox>
           <img style={{ width: 32, height: 32 }} src={left} alt="" />
@@ -182,4 +211,16 @@ const BackDiv = styled.div`
   height: 6px;
   background-color: rgba(255, 255, 255.7);
   border-radius: 20px;
+`;
+const RemainMinute = styled.span`
+  font-size: 24px;
+  font-waight: 700;
+  margin-raight: 10px;
+  color: #fff;
+`;
+const RemainSecond = styled.span`
+  font-size: 24px;
+  font-weight: 700;
+  margin-left: 0;
+  color: #fff;
 `;
