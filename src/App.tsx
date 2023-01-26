@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import play from "./images/play-button.png";
-import left from "./images/left.png";
-import right from "./images/fast-forward.png";
+import left from "./images/rewind.png";
+import right from "./images/forward.png";
 import setting from "./images/settings.png";
+import pause from "./images/pause.png";
 import { useEffect, useRef, useState } from "react";
 import video360 from "./videos/360.mp4";
 import video720 from "./videos/720.mp4";
@@ -11,13 +12,14 @@ const videoUrl =
 
 function App() {
   const [width, setWidth] = useState(0);
-  const [currentWami, setCurrentWami] = useState<any>("00:00");
+  const [currentWami, setCurrentWami] = useState<any>(0);
   const [currentWuti, setCurrentWuti] = useState<any>();
   const [settingClicked, setSettingClicked] = useState<boolean>(false);
-  const [totalWami, setTotalWami] = useState<any>("00:00");
+  const [totalWami, setTotalWami] = useState<any>(0);
   const [totalWuti, setTotalWuti] = useState<any>();
-  const [leftTime, setLeftTime] = useState<any>();
   const [chosenVideoQuality, setChosenVideoQuality] = useState(360);
+  const [playing, setPlaying] = useState(false);
+
   const videoRef = useRef<any>(null);
   let minutes;
   let extraSeconds;
@@ -28,8 +30,6 @@ function App() {
     extraSeconds = extraSeconds < 10 ? "0" + extraSeconds : extraSeconds;
     setCurrentWami(extraSeconds);
     setCurrentWuti(minutes);
-
-    // console.log(minutes, extraSeconds);
   }
   useEffect(() => {
     videoRef.current.addEventListener("timeupdate", (e: any) => {
@@ -47,20 +47,6 @@ function App() {
           .split(".")[1]
           .slice(0, 2)
       );
-      // let time =
-      //   (videoRef.current.duration.toFixed(0) -
-      //     videoRef.current.currentTime.toFixed(0)) /
-      //   60;
-      // console.log(videoRef.current.duration.toFixed(0));
-      // console.log(videoRef.current.currentTime.toFixed(0));
-      // if (Number(time.toFixed(0)) < 10) {
-      //   setLeftWuti("0" + time.toFixed(0));
-      // } else {
-      //   setLeftWuti(time.toFixed(0));
-      // }
-
-      // let wami = time.toString().split(".")[1].slice(0, 2);
-      // setLeftWami(wami);
 
       setWidth(
         (videoRef.current.currentTime / videoRef.current.duration) * 100
@@ -70,8 +56,24 @@ function App() {
 
   function handleChange(e: any) {
     setChosenVideoQuality(e.target.value);
-    console.log(chosenVideoQuality);
   }
+  function backSecond() {
+    setCurrentWami(Number(currentWami) - 10);
+    console.log(currentWami - 10);
+  }
+  function forwardSecond() {
+    setCurrentWami(Number(currentWami) + 10);
+    console.log(currentWami + 10);
+  }
+  const videoHandler = (control: any) => {
+    if (control === "play") {
+      videoRef.current.play();
+      setPlaying(true);
+    } else if (control === "pause") {
+      videoRef.current.pause();
+      setPlaying(false);
+    }
+  };
   return (
     <Container>
       <MainDiv>
@@ -134,29 +136,38 @@ function App() {
             ></div>
           </BackDiv>
           <RemainMinute>
-            {totalWuti} :
-            <RemainSecond>
-              {/* {Number((videoRef.current?.duration - currentWami).toFixed(0)) <
-              10
-                ? `0${(videoRef.current?.duration - currentWami).toFixed(0)}`
-                : (videoRef.current?.duration - currentWami).toFixed(0)} */}
-              {totalWami}
-            </RemainSecond>
+            {totalWuti} :<RemainSecond>{totalWami}</RemainSecond>
           </RemainMinute>
         </div>
         <PlayBox>
-          <img style={{ width: 32, height: 32 }} src={left} alt="" />
           <img
-            style={{ cursor: "pointer" }}
-            src={play}
-            alt="play-button"
-            onClick={() =>
-              videoRef.current.paused
-                ? videoRef.current.play()
-                : videoRef.current.pause()
-            }
+            onClick={backSecond}
+            style={{ width: 32, height: 32 }}
+            src={left}
+            alt=""
           />
-          <img style={{ width: 32, height: 32 }} src={right} alt="" />
+          {playing ? (
+            <img onClick={() => videoHandler("pause")} src={pause} alt="" />
+          ) : (
+            <img
+              style={{ cursor: "pointer" }}
+              src={play}
+              alt="play-button"
+              onClick={
+                () => videoHandler("play")
+                // videoRef.current.paused
+                //   ? videoRef.current.play()
+                //   : videoRef.current.pause()
+              }
+            />
+          )}
+
+          <img
+            onClick={forwardSecond}
+            style={{ width: 32, height: 32 }}
+            src={right}
+            alt=""
+          />
           <img
             src={setting}
             alt=""
